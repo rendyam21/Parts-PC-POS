@@ -32,6 +32,27 @@ export default function Products() {
     image: ''
   });
 
+  const seedData = async () => {
+    const samples = [
+      { name: "ASUS ROG Strix GeForce RTX 4090 OC", price: 36500000, stock: 5, category: "GPU", image: "https://images.unsplash.com/photo-1624705002806-5d72df19c3ad?q=80&w=1000&auto=format&fit=crop" },
+      { name: "Intel Core i9-14900K Processor", price: 9850000, stock: 12, category: "Processor", image: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?q=80&w=1000&auto=format&fit=crop" },
+      { name: "MSI MEG Z790 GODLIKE Motherboard", price: 18500000, stock: 3, category: "Motherboard", image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000&auto=format&fit=crop" },
+      { name: "Corsair Dominator Titanium 64GB DDR5", price: 7450000, stock: 8, category: "RAM", image: "https://images.unsplash.com/photo-1562976540-1502c2145186?q=80&w=1000&auto=format&fit=crop" },
+      { name: "Samsung 990 PRO 4TB NVMe SSD", price: 5850000, stock: 15, category: "Storage", image: "https://images.unsplash.com/photo-1544652478-6653e09f18a2?q=80&w=1000&auto=format&fit=crop" },
+      { name: "Seasonic PRIME TX-1600 Titanium", price: 8250000, stock: 6, category: "PSU", image: "https://images.unsplash.com/photo-1591488320449-011701bb6704?q=80&w=1000&auto=format&fit=crop" },
+      { name: "HYTE Y70 Touch Panoramic Case", price: 5450000, stock: 4, category: "Case", image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=1000&auto=format&fit=crop" },
+      { name: "Corsair iCUE LINK H150i LCD AIO", price: 4950000, stock: 10, category: "Cooling", image: "https://images.unsplash.com/photo-1555617766-c94804975da3?q=80&w=1000&auto=format&fit=crop" },
+      { name: "ASUS ROG Swift OLED PG42UQ", price: 24500000, stock: 2, category: "Monitor", image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?q=80&w=1000&auto=format&fit=crop" }
+    ];
+
+    if (confirm('Ini akan menambahkan 9 produk sampel ke inventaris. Lanjutkan?')) {
+      for (const sample of samples) {
+        await addProduct(sample);
+      }
+      fetchProducts();
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -97,17 +118,25 @@ export default function Products() {
           <h1 className="text-2xl font-bold text-slate-900">Kelola Produk</h1>
           <p className="text-slate-500">Tambah, edit, atau hapus inventaris produk Anda.</p>
         </div>
-        <button 
-          onClick={() => {
-            setEditingProduct(null);
-            setFormData({ name: '', price: 0, stock: 0, category: 'Umum', image: '' });
-            setIsModalOpen(true);
-          }}
-          className="flex items-center justify-center px-4 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors shadow-sm"
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          Tambah Produk
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={seedData}
+            className="flex items-center justify-center px-4 py-2.5 bg-slate-100 text-slate-600 rounded-xl font-semibold hover:bg-slate-200 transition-colors shadow-sm"
+          >
+            Seed Sample
+          </button>
+          <button 
+            onClick={() => {
+              setEditingProduct(null);
+              setFormData({ name: '', price: 0, stock: 0, category: 'Umum', image: '' });
+              setIsModalOpen(true);
+            }}
+            className="flex items-center justify-center px-4 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors shadow-sm"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Tambah Produk
+          </button>
+        </div>
       </div>
 
       {/* Filters & Search */}
@@ -278,6 +307,9 @@ export default function Products() {
                     <option value="Motherboard">Motherboard</option>
                     <option value="Storage">Storage</option>
                     <option value="PSU">PSU</option>
+                    <option value="Case">Case</option>
+                    <option value="Cooling">Cooling</option>
+                    <option value="Monitor">Monitor</option>
                   </select>
                 </div>
                 <div>

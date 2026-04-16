@@ -1,6 +1,6 @@
 {
-  "name": "PC Parts Marketplace & PoS",
-  "description": "A specialized Marketplace and Point of Sale (PoS) application for PC Components with inventory management and transaction tracking.",
+  "name": "PC Parts Pro Webstore",
+  "description": "Premium PC components marketplace and PoS system for enthusiasts and builders.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }

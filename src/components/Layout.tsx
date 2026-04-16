@@ -9,16 +9,18 @@ import {
   X, 
   Cpu,
   Bell,
-  UserCircle
+  UserCircle,
+  Globe
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 
 const navItems = [
-  { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-  { name: 'Kelola Produk', path: '/products', icon: Package },
-  { name: 'Kasir / PoS', path: '/pos', icon: ShoppingCart },
-  { name: 'Riwayat Transaksi', path: '/transactions', icon: History },
+  { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
+  { name: 'Kelola Produk', path: '/admin/products', icon: Package },
+  { name: 'Kasir / PoS', path: '/admin/pos', icon: ShoppingCart },
+  { name: 'Riwayat Transaksi', path: '/admin/transactions', icon: History },
+  { name: 'Lihat Webstore', path: '/', icon: Globe },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
