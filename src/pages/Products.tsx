@@ -27,6 +27,7 @@ export default function Products() {
   const [formData, setFormData] = useState({
     name: '',
     price: 0,
+    costPrice: 0,
     stock: 0,
     category: 'Umum',
     image: ''
@@ -34,15 +35,15 @@ export default function Products() {
 
   const seedData = async () => {
     const samples = [
-      { name: "ASUS ROG Strix GeForce RTX 4090 OC", price: 36500000, stock: 5, category: "GPU", image: "https://images.unsplash.com/photo-1624705002806-5d72df19c3ad?q=80&w=1000&auto=format&fit=crop" },
-      { name: "Intel Core i9-14900K Processor", price: 9850000, stock: 12, category: "Processor", image: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?q=80&w=1000&auto=format&fit=crop" },
-      { name: "MSI MEG Z790 GODLIKE Motherboard", price: 18500000, stock: 3, category: "Motherboard", image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000&auto=format&fit=crop" },
-      { name: "Corsair Dominator Titanium 64GB DDR5", price: 7450000, stock: 8, category: "RAM", image: "https://images.unsplash.com/photo-1562976540-1502c2145186?q=80&w=1000&auto=format&fit=crop" },
-      { name: "Samsung 990 PRO 4TB NVMe SSD", price: 5850000, stock: 15, category: "Storage", image: "https://images.unsplash.com/photo-1544652478-6653e09f18a2?q=80&w=1000&auto=format&fit=crop" },
-      { name: "Seasonic PRIME TX-1600 Titanium", price: 8250000, stock: 6, category: "PSU", image: "https://images.unsplash.com/photo-1591488320449-011701bb6704?q=80&w=1000&auto=format&fit=crop" },
-      { name: "HYTE Y70 Touch Panoramic Case", price: 5450000, stock: 4, category: "Case", image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=1000&auto=format&fit=crop" },
-      { name: "Corsair iCUE LINK H150i LCD AIO", price: 4950000, stock: 10, category: "Cooling", image: "https://images.unsplash.com/photo-1555617766-c94804975da3?q=80&w=1000&auto=format&fit=crop" },
-      { name: "ASUS ROG Swift OLED PG42UQ", price: 24500000, stock: 2, category: "Monitor", image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?q=80&w=1000&auto=format&fit=crop" }
+      { name: "ASUS ROG Strix GeForce RTX 4090 OC", price: 36500000, costPrice: 32000000, stock: 5, category: "GPU", image: "https://images.unsplash.com/photo-1624705002806-5d72df19c3ad?q=80&w=1000&auto=format&fit=crop" },
+      { name: "Intel Core i9-14900K Processor", price: 9850000, costPrice: 8500000, stock: 12, category: "Processor", image: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?q=80&w=1000&auto=format&fit=crop" },
+      { name: "MSI MEG Z790 GODLIKE Motherboard", price: 18500000, costPrice: 16000000, stock: 3, category: "Motherboard", image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000&auto=format&fit=crop" },
+      { name: "Corsair Dominator Titanium 64GB DDR5", price: 7450000, costPrice: 6500000, stock: 8, category: "RAM", image: "https://images.unsplash.com/photo-1562976540-1502c2145186?q=80&w=1000&auto=format&fit=crop" },
+      { name: "Samsung 990 PRO 4TB NVMe SSD", price: 5850000, costPrice: 5000000, stock: 15, category: "Storage", image: "https://images.unsplash.com/photo-1544652478-6653e09f18a2?q=80&w=1000&auto=format&fit=crop" },
+      { name: "Seasonic PRIME TX-1600 Titanium", price: 8250000, costPrice: 7200000, stock: 6, category: "PSU", image: "https://images.unsplash.com/photo-1591488320449-011701bb6704?q=80&w=1000&auto=format&fit=crop" },
+      { name: "HYTE Y70 Touch Panoramic Case", price: 5450000, costPrice: 4800000, stock: 4, category: "Case", image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=1000&auto=format&fit=crop" },
+      { name: "Corsair iCUE LINK H150i LCD AIO", price: 4950000, costPrice: 4200000, stock: 10, category: "Cooling", image: "https://images.unsplash.com/photo-1555617766-c94804975da3?q=80&w=1000&auto=format&fit=crop" },
+      { name: "ASUS ROG Swift OLED PG42UQ", price: 24500000, costPrice: 21000000, stock: 2, category: "Monitor", image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?q=80&w=1000&auto=format&fit=crop" }
     ];
 
     if (confirm('Ini akan menambahkan 9 produk sampel ke inventaris. Lanjutkan?')) {
@@ -77,7 +78,7 @@ export default function Products() {
     }
     setIsModalOpen(false);
     setEditingProduct(null);
-    setFormData({ name: '', price: 0, stock: 0, category: 'Umum', image: '' });
+    setFormData({ name: '', price: 0, costPrice: 0, stock: 0, category: 'Umum', image: '' });
     fetchProducts();
   };
 
@@ -86,6 +87,7 @@ export default function Products() {
     setFormData({
       name: product.name,
       price: product.price,
+      costPrice: product.costPrice || 0,
       stock: product.stock,
       category: product.category,
       image: product.image || ''
@@ -128,7 +130,7 @@ export default function Products() {
           <button 
             onClick={() => {
               setEditingProduct(null);
-              setFormData({ name: '', price: 0, stock: 0, category: 'Umum', image: '' });
+              setFormData({ name: '', price: 0, costPrice: 0, stock: 0, category: 'Umum', image: '' });
               setIsModalOpen(true);
             }}
             className="flex items-center justify-center px-4 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors shadow-sm"
@@ -165,7 +167,8 @@ export default function Products() {
               <tr className="bg-slate-50 border-b border-slate-200">
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Produk</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Kategori</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Harga</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">H. Jual</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">H. Modal</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Stok</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Aksi</th>
               </tr>
@@ -190,8 +193,11 @@ export default function Products() {
                       {product.category}
                     </span>
                   </td>
-                  <td className="px-6 py-4 font-medium text-slate-900">
+                  <td className="px-6 py-4 font-medium text-slate-900 text-sm">
                     {formatCurrency(product.price)}
+                  </td>
+                  <td className="px-6 py-4 font-medium text-slate-400 text-xs">
+                    {formatCurrency(product.costPrice || 0)}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-2">
@@ -271,7 +277,7 @@ export default function Products() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">Harga (IDR)</label>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Harga Jual (IDR)</label>
                     <input 
                       required
                       type="text"
@@ -280,6 +286,38 @@ export default function Products() {
                       className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
                       placeholder="0"
                     />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Harga Modal (IDR)</label>
+                    <input 
+                      required
+                      type="text"
+                      value={formatNumber(formData.costPrice)}
+                      onChange={(e) => setFormData({...formData, costPrice: parseNumber(e.target.value)})}
+                      className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex-1">
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Kategori</label>
+                    <select 
+                      value={formData.category}
+                      onChange={(e) => setFormData({...formData, category: e.target.value})}
+                      className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                    >
+                      <option value="Umum">Umum</option>
+                      <option value="Processor">Processor</option>
+                      <option value="GPU">GPU</option>
+                      <option value="RAM">RAM</option>
+                      <option value="Motherboard">Motherboard</option>
+                      <option value="Storage">Storage</option>
+                      <option value="PSU">PSU</option>
+                      <option value="Case">Case</option>
+                      <option value="Cooling">Cooling</option>
+                      <option value="Monitor">Monitor</option>
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-1">Stok</label>
@@ -292,25 +330,6 @@ export default function Products() {
                       placeholder="0"
                     />
                   </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">Kategori</label>
-                  <select 
-                    value={formData.category}
-                    onChange={(e) => setFormData({...formData, category: e.target.value})}
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
-                  >
-                    <option value="Umum">Umum</option>
-                    <option value="Processor">Processor</option>
-                    <option value="GPU">GPU</option>
-                    <option value="RAM">RAM</option>
-                    <option value="Motherboard">Motherboard</option>
-                    <option value="Storage">Storage</option>
-                    <option value="PSU">PSU</option>
-                    <option value="Case">Case</option>
-                    <option value="Cooling">Cooling</option>
-                    <option value="Monitor">Monitor</option>
-                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-1">Gambar Produk</label>

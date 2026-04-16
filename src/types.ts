@@ -2,6 +2,7 @@ export interface Product {
   id?: number;
   name: string;
   price: number;
+  costPrice: number; // Added: Harga Modal
   stock: number;
   category: string;
   image?: string;
@@ -12,6 +13,7 @@ export interface TransactionItem {
   productId: number;
   name: string;
   price: number;
+  costPrice: number; // Added: Harga Modal saat transaksi
   quantity: number;
 }
 

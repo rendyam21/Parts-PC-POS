@@ -11,7 +11,8 @@ import {
   CheckCircle2,
   Package,
   ArrowRight,
-  X
+  X,
+  Printer
 } from 'lucide-react';
 import { getAllProducts, addTransaction } from '../lib/db';
 import { Product, TransactionItem } from '../types';
@@ -25,6 +26,8 @@ export default function POS() {
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'transfer' | 'qris'>('cash');
   const [cashReceived, setCashReceived] = useState<number>(0);
   const [isCheckoutSuccess, setIsCheckoutSuccess] = useState(false);
+  const [lastTransactionId, setLastTransactionId] = useState<number | null>(null);
+  const [lastTransaction, setLastTransaction] = useState<any>(null);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
 
   useEffect(() => {
@@ -96,17 +99,23 @@ export default function POS() {
     }
     
     try {
-      await addTransaction({
-        items: cart,
+      const transactionData = {
+        items: cart.map(item => ({
+          ...item,
+          costPrice: products.find(p => p.id === item.productId)?.costPrice || 0
+        })),
         total,
         paymentMethod
-      });
+      };
+      const id = await addTransaction(transactionData);
+      setLastTransactionId(id);
+      setLastTransaction(transactionData);
+      
       setIsCheckoutModalOpen(false);
       setIsCheckoutSuccess(true);
       setCart([]);
       setCashReceived(0);
       fetchProducts();
-      setTimeout(() => setIsCheckoutSuccess(false), 3000);
     } catch (error) {
       console.error('Checkout failed:', error);
       alert('Checkout gagal. Silakan coba lagi.');
@@ -437,25 +446,81 @@ export default function POS() {
         )}
       </AnimatePresence>
 
-      {/* Success Animation Overlay */}
+      {/* Success Modal with Receipt Printing */}
       <AnimatePresence>
         {isCheckoutSuccess && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[110] flex items-center justify-center bg-blue-600/90 backdrop-blur-md"
-          >
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
             <motion.div 
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="text-center text-white"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-blue-600/20 backdrop-blur-xl"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 30 }}
+              className="relative w-full max-w-sm bg-white rounded-[3rem] shadow-2xl p-8 text-center space-y-6"
             >
-              <CheckCircle2 className="w-24 h-24 mx-auto mb-4" />
-              <h2 className="text-3xl font-bold mb-2">Pembayaran Berhasil!</h2>
-              <p className="text-blue-100">Transaksi telah dicatat ke dalam sistem.</p>
+              <div className="mx-auto w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center relative">
+                <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+                <div className="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping" />
+              </div>
+
+              <div className="space-y-1">
+                <h2 className="text-2xl font-black text-slate-900 leading-tight">Transaksi Berhasil!</h2>
+                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">ID: #{lastTransactionId}</p>
+              </div>
+
+              {/* Printable Receipt Preview */}
+              <div className="bg-slate-50 rounded-3xl p-6 space-y-4 text-left printable">
+                <div className="text-center border-b border-dashed border-slate-200 pb-3 mb-2">
+                  <p className="font-black text-xs uppercase tracking-widest">PC PARTS PRO - POS</p>
+                  <p className="text-[10px] text-slate-400">Bukti Transaksi Toko</p>
+                </div>
+
+                <div className="space-y-1.5 py-2 border-b border-dashed border-slate-200">
+                  {lastTransaction?.items.map((item: any, idx: number) => (
+                    <div key={idx} className="flex justify-between text-[10px]">
+                      <span className="text-slate-600">{item.name} x{item.quantity}</span>
+                      <span className="font-bold text-slate-900">{formatCurrency(item.price * item.quantity)}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="space-y-2 pt-2">
+                  <div className="flex justify-between text-[10px]">
+                    <span className="text-slate-400 font-bold uppercase">Total</span>
+                    <span className="font-black text-slate-900">{formatCurrency(lastTransaction?.total || 0)}</span>
+                  </div>
+                  <div className="flex justify-between text-[10px]">
+                    <span className="text-slate-400 font-bold uppercase">Metode</span>
+                    <span className="font-bold text-slate-900 capitalize">{lastTransaction?.paymentMethod}</span>
+                  </div>
+                </div>
+
+                <div className="text-center pt-2">
+                  <p className="text-[8px] text-slate-400 font-bold italic uppercase tracking-widest">Terima kasih atas kunjungannya!</p>
+                </div>
+              </div>
+
+              <div className="space-y-3 no-print">
+                <button 
+                  onClick={() => window.print()}
+                  className="w-full py-4 bg-white border border-slate-200 text-slate-700 rounded-2xl font-bold hover:bg-slate-50 transition-all flex items-center justify-center space-x-2"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>Cetak Struk</span>
+                </button>
+                <button 
+                  onClick={() => setIsCheckoutSuccess(false)}
+                  className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black hover:bg-slate-800 transition-all shadow-lg"
+                >
+                  Selesai
+                </button>
+              </div>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

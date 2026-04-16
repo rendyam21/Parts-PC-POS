@@ -11,10 +11,13 @@ import {
   Cpu,
   Zap,
   ShieldCheck,
-  Truck
+  Truck,
+  CheckCircle2,
+  Printer
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatCurrency, cn } from '../lib/utils';
+import { addTransaction } from '../lib/db';
 
 interface WebstoreProduct {
   id: number;
@@ -107,6 +110,11 @@ const MOCK_PRODUCTS: WebstoreProduct[] = [
 export default function Webstore() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [lastTransactionId, setLastTransactionId] = useState<number | null>(null);
+  const [lastTransactionItems, setLastTransactionItems] = useState<CartItem[]>([]);
+  const [selectedPayment, setSelectedPayment] = useState<'cash' | 'transfer' | 'qris' | null>(null);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -144,14 +152,53 @@ export default function Webstore() {
 
   const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
-  const handleCheckout = () => {
+  const handleCheckoutInitiate = () => {
+    setIsPaymentModalOpen(true);
+  };
+
+  const handleFinalCheckout = async () => {
+    if (!selectedPayment) return;
+    
+    try {
+      // Save to Database
+      const transactionData = {
+        items: cart.map(item => ({
+          productId: item.id,
+          name: item.name,
+          price: item.price,
+          costPrice: (item as any).costPrice || (MOCK_PRODUCTS.find(p => p.id === item.id) as any)?.costPrice || 0,
+          quantity: item.quantity
+        })),
+        total: total,
+        paymentMethod: selectedPayment as any
+      };
+
+      const id = await addTransaction(transactionData as any);
+      setLastTransactionId(id);
+      setLastTransactionItems([...cart]);
+      
+      setIsPaymentModalOpen(false);
+      setIsSuccessModalOpen(true);
+      setCart([]);
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert('Terjadi kesalahan saat memproses pesanan.');
+    }
+  };
+
+  const handleContactWhatsApp = () => {
     const phoneNumber = "6281234567890"; // Ganti dengan nomor WhatsApp tujuan
     const message = encodeURIComponent(
-      `Halo PC Parts Pro, saya ingin memesan:\n\n` +
-      cart.map(item => `- ${item.name} (x${item.quantity}) - ${formatCurrency(item.price * item.quantity)}`).join('\n') +
-      `\n\n*Total: ${formatCurrency(total)}*\n\nMohon informasi selanjutnya untuk pembayaran. Terima kasih!`
+      `Halo PC Parts Pro, saya ingin mengonfirmasi pesanan saya (ID: #${lastTransactionId}).\n\n` +
+      `*Total: ${formatCurrency(total)}*\n` +
+      `*Metode: ${(selectedPayment || '').toUpperCase()}*\n\n` +
+      `Terima kasih!`
     );
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+  };
+
+  const handlePrintReceipt = () => {
+    window.print();
   };
 
   return (
@@ -573,11 +620,11 @@ export default function Webstore() {
                   </div>
 
                   <button 
-                    onClick={handleCheckout}
+                    onClick={handleCheckoutInitiate}
                     className="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-lg hover:bg-blue-700 transition-all shadow-xl shadow-blue-200 flex items-center justify-center space-x-3"
                   >
-                    <MessageCircle className="w-6 h-6" />
-                    <span>Checkout via WhatsApp</span>
+                    <ShoppingBag className="w-6 h-6" />
+                    <span>Selesaikan Pesanan</span>
                   </button>
                   <p className="text-[10px] text-center text-slate-400 uppercase tracking-widest font-bold">
                     Secure Checkout Guaranteed
@@ -586,6 +633,193 @@ export default function Webstore() {
               )}
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+      {/* Payment Selection Modal */}
+      <AnimatePresence>
+        {isPaymentModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsPaymentModalOpen(false)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-md bg-white rounded-[3rem] shadow-2xl overflow-hidden"
+            >
+              <div className="p-8 space-y-8">
+                <div className="text-center space-y-2">
+                  <h2 className="text-2xl font-black text-slate-900">Pilih Pembayaran</h2>
+                  <p className="text-slate-500 text-sm">Silakan pilih metode pembayaran favorit Anda</p>
+                </div>
+
+                <div className="grid gap-4">
+                  {[
+                    { id: 'cash', name: 'Tunai / Cash', icon: <Zap className="w-6 h-6" />, desc: 'Bayar saat pengambilan' },
+                    { id: 'transfer', name: 'Bank Transfer', icon: <Cpu className="w-6 h-6" />, desc: 'BCA, Mandiri, BNI' },
+                    { id: 'qris', name: 'QRIS / E-Wallet', icon: <ShieldCheck className="w-6 h-6" />, desc: 'GoPay, OVO, Dana' }
+                  ].map((method) => (
+                    <button
+                      key={method.id}
+                      onClick={() => setSelectedPayment(method.id as any)}
+                      className={cn(
+                        "flex items-center space-x-4 p-5 rounded-[2rem] border-2 transition-all text-left group",
+                        selectedPayment === method.id 
+                          ? "border-blue-600 bg-blue-50/50" 
+                          : "border-slate-100 hover:border-blue-200 hover:bg-slate-50"
+                      )}
+                    >
+                      <div className={cn(
+                        "p-3 rounded-2xl transition-colors",
+                        selectedPayment === method.id ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-600"
+                      )}>
+                        {method.icon}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-bold text-slate-900">{method.name}</p>
+                        <p className="text-xs text-slate-500 font-medium">{method.desc}</p>
+                      </div>
+                      {selectedPayment === method.id && (
+                        <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                          <Plus className="w-4 h-4 text-white rotate-45" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="space-y-4">
+                  <button
+                    disabled={!selectedPayment}
+                    onClick={handleFinalCheckout}
+                    className="w-full py-5 bg-blue-600 text-white rounded-[2rem] font-black text-lg shadow-xl shadow-blue-200 disabled:opacity-50 disabled:shadow-none transition-all active:scale-95 flex items-center justify-center space-x-3"
+                  >
+                    <span>Selesaikan Pembayaran</span>
+                  </button>
+                  <button
+                    onClick={() => setIsPaymentModalOpen(false)}
+                    className="w-full py-4 text-slate-400 font-bold hover:text-slate-600 transition-colors text-sm"
+                  >
+                    Kembali
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      {/* Success Modal */}
+      <AnimatePresence>
+        {isSuccessModalOpen && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-blue-600/10 backdrop-blur-xl"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 30 }}
+              className="relative w-full max-w-sm bg-white rounded-[3rem] shadow-2xl p-8 text-center space-y-8"
+            >
+              <div className="relative mx-auto w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: 'spring' }}
+                >
+                  <CheckCircle2 className="w-12 h-12 text-emerald-500" />
+                </motion.div>
+                <div className="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping" />
+              </div>
+
+              <div className="space-y-2">
+                <h2 className="text-3xl font-black text-slate-900 leading-tight">Pesanan Berhasil!</h2>
+                <p className="text-slate-500 font-medium">Transaksi Anda telah tercatat dengan ID <span className="text-blue-600 font-bold">#{lastTransactionId}</span></p>
+              </div>
+
+              <div className="bg-slate-50 rounded-3xl p-6 space-y-4 printable">
+                <div className="text-center border-b border-dashed border-slate-200 pb-3 mb-2">
+                  <p className="font-black text-xs uppercase tracking-widest">PC PARTS PRO</p>
+                  <p className="text-[10px] text-slate-400">Bukti Pembayaran Sah</p>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between text-[10px]">
+                    <span className="text-slate-400">ID Transaksi</span>
+                    <span className="font-bold text-slate-900">#{lastTransactionId}</span>
+                  </div>
+                  <div className="flex justify-between text-[10px]">
+                    <span className="text-slate-400">Waktu</span>
+                    <span className="font-bold text-slate-900">{new Date().toLocaleString('id-ID')}</span>
+                  </div>
+                </div>
+
+                <div className="py-3 border-y border-dashed border-slate-200 space-y-2">
+                  {lastTransactionItems.map((item, idx) => (
+                    <div key={idx} className="flex justify-between text-[10px]">
+                      <span className="text-slate-600 truncate max-w-[120px]">{item.name} x{item.quantity}</span>
+                      <span className="font-bold text-slate-900 shrink-0">{formatCurrency(item.price * item.quantity)}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between text-[10px]">
+                    <span className="text-slate-400">Metode</span>
+                    <span className="font-bold text-slate-900 capitalize">{selectedPayment}</span>
+                  </div>
+                  <div className="flex justify-between text-[10px]">
+                    <span className="text-slate-400">Status</span>
+                    <span className="text-emerald-600 font-black uppercase">Berhasil</span>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-slate-900">
+                  <div className="flex justify-between font-black text-sm text-slate-900 uppercase">
+                    <span>Total Bayar</span>
+                    <span>{formatCurrency(lastTransactionItems.reduce((acc, i) => acc + (i.price * i.quantity), 0))}</span>
+                  </div>
+                </div>
+
+                <div className="text-center pt-2">
+                  <p className="text-[8px] text-slate-400 font-medium italic">Terima kasih atas kepercayaan Anda!</p>
+                </div>
+              </div>
+
+              <div className="space-y-3 no-print">
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={handlePrintReceipt}
+                    className="py-4 bg-white border border-slate-200 text-slate-700 rounded-[2rem] font-bold hover:bg-slate-50 transition-all flex items-center justify-center space-x-2"
+                  >
+                    <Printer className="w-4 h-4" />
+                    <span>Cetak Struk</span>
+                  </button>
+                  <button
+                    onClick={handleContactWhatsApp}
+                    className="py-4 bg-emerald-50 text-emerald-700 rounded-[2rem] font-bold hover:bg-emerald-100 transition-all flex items-center justify-center space-x-2"
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    <span>WhatsApp</span>
+                  </button>
+                </div>
+                <button
+                  onClick={() => setIsSuccessModalOpen(false)}
+                  className="w-full py-4 bg-slate-900 text-white rounded-[2rem] font-black hover:bg-slate-800 transition-all shadow-lg"
+                >
+                  Kembali Belanja
+                </button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>
