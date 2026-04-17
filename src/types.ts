@@ -35,3 +35,10 @@ export interface Transaction {
   paymentMethod: 'cash' | 'transfer' | 'qris';
   timestamp: number;
 }
+
+export interface AppSettings {
+  appName: string;
+  appDescription: string;
+  profitMarginType: 'percentage' | 'nominal';
+  profitMarginValue: number;
+}

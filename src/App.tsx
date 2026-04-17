@@ -12,6 +12,7 @@ import POS from './pages/POS';
 import Transactions from './pages/Transactions';
 import Reports from './pages/Reports';
 import Suppliers from './pages/Suppliers';
+import Settings from './pages/Settings';
 import NotFound from './pages/NotFound';
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
               <Route path="transactions" element={<Transactions />} />
               <Route path="reports" element={<Reports />} />
               <Route path="suppliers" element={<Suppliers />} />
+              <Route path="settings" element={<Settings />} />
               <Route path="*" element={<Dashboard />} />
             </Routes>
           </Layout>

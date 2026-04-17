@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -13,10 +13,14 @@ import {
   Globe,
   BarChart3,
   Truck,
-  ArrowLeft
+  ArrowLeft,
+  Settings as SettingsIcon,
+  Zap
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
+import { getSettings } from '../lib/db';
+import { AppSettings } from '../types';
 
 const navItems = [
   { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
@@ -25,12 +29,22 @@ const navItems = [
   { name: 'Kasir / PoS', path: '/admin/pos', icon: ShoppingCart },
   { name: 'Riwayat Transaksi', path: '/admin/transactions', icon: History },
   { name: 'Laporan', path: '/admin/reports', icon: BarChart3 },
+  { name: 'Pengaturan', path: '/admin/settings', icon: SettingsIcon },
   { name: 'Lihat Webstore', path: '/', icon: Globe },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [appSettings, setAppSettings] = useState<AppSettings | null>(null);
   const location = useLocation();
+
+  useEffect(() => {
+    async function loadSettings() {
+      const settings = await getSettings();
+      setAppSettings(settings);
+    }
+    loadSettings();
+  }, [location.pathname]); // Update settings if navigating back from settings page
 
   return (
     <div className="min-h-screen bg-slate-50 flex text-slate-900 font-sans">
@@ -56,16 +70,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       >
         <div className="h-full flex flex-col">
           {/* Logo */}
-          <div className="h-16 flex items-center px-4 border-b border-slate-100 overflow-hidden">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shrink-0 shadow-lg shadow-blue-100">
-              <Cpu className="w-5 h-5 text-white" />
+          <div className="h-16 flex items-center px-4 border-b border-slate-100 overflow-hidden bg-slate-50/50">
+            <div className="w-9 h-9 bg-slate-900 rounded-xl flex items-center justify-center shrink-0 shadow-xl shadow-slate-200 ring-1 ring-slate-800">
+              <Cpu className="w-5 h-5 text-indigo-400" />
             </div>
             <div className={cn(
               "ml-3 flex flex-col transition-all duration-300 origin-left truncate",
               !isSidebarOpen && "lg:scale-0 lg:opacity-0 lg:w-0"
             )}>
-              <span className="font-black text-xs uppercase tracking-tighter leading-tight">webstore RendyAM</span>
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">Panel Admin</span>
+              <span className="font-black text-xs uppercase tracking-[0.15em] text-slate-900 leading-tight">
+                {appSettings?.appName || 'PC PARTS'}
+              </span>
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mt-0.5">Premium Parts</span>
             </div>
           </div>
 
@@ -119,7 +135,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 "ml-3 transition-all duration-300 origin-left truncate",
                 !isSidebarOpen && "lg:scale-0 lg:opacity-0 lg:w-0"
               )}>
-                <p className="text-[10px] font-black uppercase text-slate-900 leading-tight">webstore RendyAM</p>
+                <p className="text-[10px] font-black uppercase text-slate-900 leading-tight">{appSettings?.appName || 'PC PARTS'}</p>
                 <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Administrator</p>
               </div>
             </div>

@@ -1,5 +1,5 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
-import { Product, Transaction, Supplier } from '../types';
+import { Product, Transaction, Supplier, AppSettings } from '../types';
 
 interface PCPartsDB extends DBSchema {
   products: {
@@ -17,10 +17,14 @@ interface PCPartsDB extends DBSchema {
     value: Supplier;
     indexes: { 'by-name': string };
   };
+  settings: {
+    key: string;
+    value: AppSettings;
+  };
 }
 
 const DATABASE_NAME = 'pc-parts-pos-db';
-const DATABASE_VERSION = 2;
+const DATABASE_VERSION = 3;
 
 export async function initDB(): Promise<IDBPDatabase<PCPartsDB>> {
   return openDB<PCPartsDB>(DATABASE_NAME, DATABASE_VERSION, {
@@ -45,6 +49,9 @@ export async function initDB(): Promise<IDBPDatabase<PCPartsDB>> {
           autoIncrement: true,
         });
         supplierStore.createIndex('by-name', 'name');
+      }
+      if (!db.objectStoreNames.contains('settings')) {
+        db.createObjectStore('settings');
       }
     },
   });
@@ -114,4 +121,24 @@ export async function updateSupplier(supplier: Supplier) {
 export async function deleteSupplier(id: number) {
   const db = await dbPromise;
   return db.delete('suppliers', id);
+}
+
+// Settings operations
+const SETTINGS_KEY = 'app_settings';
+export const DEFAULT_SETTINGS: AppSettings = {
+  appName: 'PC PARTS',
+  appDescription: 'Premium PC components marketplace and PoS system for enthusiasts and builders.',
+  profitMarginType: 'percentage',
+  profitMarginValue: 10
+};
+
+export async function getSettings(): Promise<AppSettings> {
+  const db = await dbPromise;
+  const settings = await db.get('settings', SETTINGS_KEY);
+  return settings || DEFAULT_SETTINGS;
+}
+
+export async function saveSettings(settings: AppSettings) {
+  const db = await dbPromise;
+  return db.put('settings', settings, SETTINGS_KEY);
 }

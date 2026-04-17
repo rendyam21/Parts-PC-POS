@@ -18,7 +18,8 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatCurrency, cn } from '../lib/utils';
-import { addTransaction } from '../lib/db';
+import { addTransaction, getSettings } from '../lib/db';
+import { AppSettings } from '../types';
 
 interface WebstoreProduct {
   id: number;
@@ -86,7 +87,7 @@ const MOCK_PRODUCTS: WebstoreProduct[] = [
     id: 7,
     name: "HYTE Y70 Touch Panoramic Case",
     price: 5450000,
-    image: "https://images.unsplash.com/photo-1631553127989-53d34086ce13?q=80&w=1000&auto=format&fit=crop",
+    image: "https://hyte.com/cdn/shop/files/HYTE_Y70_Touch_Snow_White_Perspective.png?v=1708468352",
     description: "Casing estetika modern yang menampilkan layar multi-sentuh 4K terintegrasi dan desain kaca panoramik.",
     category: "Casing"
   },
@@ -94,7 +95,7 @@ const MOCK_PRODUCTS: WebstoreProduct[] = [
     id: 8,
     name: "Corsair iCUE LINK H150i LCD AIO",
     price: 4950000,
-    image: "https://images.unsplash.com/photo-1614932259125-276cb9607f87?q=80&w=1000&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1611078489935-0cb964de46d6?q=80&w=1000&auto=format&fit=crop",
     description: "Pendingin cairan CPU 360mm dengan layar LCD 2,1\" yang cerah dan sistem kabel iCUE LINK yang revolusioner.",
     category: "Pendingin"
   },
@@ -117,8 +118,15 @@ export default function Webstore() {
   const [lastTransactionItems, setLastTransactionItems] = useState<CartItem[]>([]);
   const [selectedPayment, setSelectedPayment] = useState<'cash' | 'transfer' | 'qris' | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [appSettings, setAppSettings] = useState<AppSettings | null>(null);
 
   useEffect(() => {
+    async function loadData() {
+      const settings = await getSettings();
+      setAppSettings(settings);
+    }
+    loadData();
+
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -210,11 +218,13 @@ export default function Webstore() {
         scrolled ? "bg-white/80 backdrop-blur-xl border-b border-slate-100 shadow-sm py-3" : "bg-transparent"
       )}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
-              <Cpu className="w-6 h-6 text-white" />
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-2xl shadow-slate-200 border border-slate-800">
+              <Cpu className="w-6 h-6 text-indigo-400" />
             </div>
-            <span className="text-xl font-black tracking-tight text-slate-900 uppercase">webstore <span className="text-blue-600">RendyAM</span></span>
+            <span className="text-2xl font-black tracking-[0.2em] text-slate-900 uppercase">
+              {appSettings?.appName || 'PC PARTS'}
+            </span>
           </div>
           
           <div className="hidden md:flex items-center space-x-8 text-sm font-bold text-slate-600">
@@ -297,7 +307,7 @@ export default function Webstore() {
                  transition={{ delay: 0.2, duration: 0.6 }}
                  className="text-xl text-slate-500 max-w-lg leading-relaxed font-medium"
                >
-                 Tingkatkan pengalaman komputasi Anda dengan komponen kelas dunia. Kami mengkurasi hanya hardware paling bertenaga untuk Anda yang menolak berkompromi.
+                 {appSettings?.appDescription || 'Tingkatkan pengalaman komputasi Anda dengan komponen kelas dunia. Kami mengkurasi hanya hardware paling bertenaga untuk Anda yang menolak berkompromi.'}
                </motion.p>
              </div>
  
@@ -495,14 +505,14 @@ export default function Webstore() {
       <footer className="bg-slate-900 text-white py-20 px-6">
         <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12">
           <div className="col-span-2 space-y-6">
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
-                <Cpu className="w-6 h-6 text-white" />
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center shadow-2xl border border-white/10">
+                <Cpu className="w-7 h-7 text-indigo-400" />
               </div>
-              <span className="text-xl font-black tracking-tight uppercase">webstore RendyAM</span>
+              <span className="text-2xl font-black tracking-[0.2em] uppercase">{appSettings?.appName || 'PC PARTS'}</span>
             </div>
-            <p className="text-slate-400 max-w-sm leading-relaxed">
-              Tujuan utama Anda untuk hardware PC premium. Kami menyediakan komponen terbaik dengan garansi resmi dan dukungan ahli.
+            <p className="text-slate-400 max-w-sm leading-relaxed font-medium">
+              {appSettings?.appDescription || 'Destinasi utama komponen PC premium. Kami menghadirkan hardware terbaik dengan kurasi ketat dan garansi resmi.'}
             </p>
           </div>
           <div className="space-y-6">
@@ -526,7 +536,7 @@ export default function Webstore() {
           </div>
         </div>
         <div className="max-w-7xl mx-auto pt-12 mt-12 border-t border-slate-800 text-center text-sm text-slate-500">
-          © 2026 webstore RendyAM. Seluruh hak cipta dilindungi.
+          © 2026 {appSettings?.appName || 'webstore RendyAM'}. Seluruh hak cipta dilindungi.
         </div>
       </footer>
 
@@ -578,7 +588,7 @@ export default function Webstore() {
                   cart.map((item) => (
                     <div key={item.id} className="flex space-x-4 group">
                       <div className="w-24 h-24 rounded-2xl overflow-hidden bg-slate-50 flex-shrink-0 border border-slate-100">
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                       </div>
                       <div className="flex-1 space-y-2">
                         <div className="flex justify-between">

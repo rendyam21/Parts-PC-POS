@@ -12,8 +12,8 @@ import {
   Image as ImageIcon,
   Truck
 } from 'lucide-react';
-import { getAllProducts, addProduct, updateProduct, deleteProduct, getAllSuppliers } from '../lib/db';
-import { Product, Supplier } from '../types';
+import { getAllProducts, addProduct, updateProduct, deleteProduct, getAllSuppliers, getSettings } from '../lib/db';
+import { Product, Supplier, AppSettings } from '../types';
 import { formatCurrency, cn, formatNumber, parseNumber } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -24,6 +24,7 @@ export default function Products() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [appSettings, setAppSettings] = useState<AppSettings | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -44,8 +45,8 @@ export default function Products() {
       { name: "Corsair Dominator Titanium 64GB DDR5", price: 7450000, costPrice: 6500000, stock: 8, category: "RAM", image: "https://images.unsplash.com/photo-1562976540-1502c2145186?q=80&w=1000&auto=format&fit=crop" },
       { name: "Samsung 990 PRO 4TB NVMe SSD", price: 5850000, costPrice: 5000000, stock: 15, category: "Storage", image: "https://images.unsplash.com/photo-1544652478-6653e09f18a2?q=80&w=1000&auto=format&fit=crop" },
       { name: "Seasonic PRIME TX-1600 Titanium", price: 8250000, costPrice: 7200000, stock: 6, category: "PSU", image: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=1000&auto=format&fit=crop" },
-      { name: "HYTE Y70 Touch Panoramic Case", price: 5450000, costPrice: 4800000, stock: 4, category: "Case", image: "https://images.unsplash.com/photo-1631553127989-53d34086ce13?q=80&w=1000&auto=format&fit=crop" },
-      { name: "Corsair iCUE LINK H150i LCD AIO", price: 4950000, costPrice: 4200000, stock: 10, category: "Cooling", image: "https://images.unsplash.com/photo-1614932259125-276cb9607f87?q=80&w=1000&auto=format&fit=crop" },
+      { name: "HYTE Y70 Touch Panoramic Case", price: 5450000, costPrice: 4800000, stock: 4, category: "Case", image: "https://hyte.com/cdn/shop/files/HYTE_Y70_Touch_Snow_White_Perspective.png?v=1708468352" },
+      { name: "Corsair iCUE LINK H150i LCD AIO", price: 4950000, costPrice: 4200000, stock: 10, category: "Cooling", image: "https://images.unsplash.com/photo-1611078489935-0cb964de46d6?q=80&w=1000&auto=format&fit=crop" },
       { name: "ASUS ROG Swift OLED PG42UQ", price: 24500000, costPrice: 21000000, stock: 2, category: "Monitor", image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?q=80&w=1000&auto=format&fit=crop" }
     ];
 
@@ -62,12 +63,14 @@ export default function Products() {
   }, []);
 
   async function fetchData() {
-    const [pData, sData] = await Promise.all([
+    const [pData, sData, settingsData] = await Promise.all([
       getAllProducts(),
-      getAllSuppliers()
+      getAllSuppliers(),
+      getSettings()
     ]);
     setProducts(pData);
     setSuppliers(sData);
+    setAppSettings(settingsData);
     setLoading(false);
   }
 
@@ -108,6 +111,18 @@ export default function Products() {
       await deleteProduct(id);
       fetchData();
     }
+  };
+
+  const handleCostPriceChange = (value: number) => {
+    let sellingPrice = formData.price;
+    if (appSettings) {
+      if (appSettings.profitMarginType === 'percentage') {
+        sellingPrice = value + (value * appSettings.profitMarginValue / 100);
+      } else {
+        sellingPrice = value + appSettings.profitMarginValue;
+      }
+    }
+    setFormData({ ...formData, costPrice: value, price: sellingPrice });
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -188,7 +203,7 @@ export default function Products() {
                     <div className="flex items-center space-x-3">
                       <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden shrink-0 border border-slate-200">
                         {product.image ? (
-                          <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                          <img src={product.image} alt={product.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                         ) : (
                           <Package className="w-6 h-6 text-slate-400" />
                         )}
@@ -291,26 +306,28 @@ export default function Products() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Harga Beli / Modal (IDR)</label>
+                    <input 
+                      required
+                      type="text"
+                      value={formatNumber(formData.costPrice)}
+                      onChange={(e) => handleCostPriceChange(parseNumber(e.target.value))}
+                      className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all font-bold text-amber-600"
+                      placeholder="0"
+                    />
+                    <p className="text-[10px] text-slate-400 mt-1 uppercase font-black tracking-widest">Modal Awal</p>
+                  </div>
+                  <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-1">Harga Jual (IDR)</label>
                     <input 
                       required
                       type="text"
                       value={formatNumber(formData.price)}
                       onChange={(e) => setFormData({...formData, price: parseNumber(e.target.value)})}
-                      className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                      className="w-full px-4 py-2 bg-white border-2 border-indigo-100 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all font-bold text-indigo-600 shadow-sm"
                       placeholder="0"
                     />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">Harga Modal (IDR)</label>
-                    <input 
-                      required
-                      type="text"
-                      value={formatNumber(formData.costPrice)}
-                      onChange={(e) => setFormData({...formData, costPrice: parseNumber(e.target.value)})}
-                      className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
-                      placeholder="0"
-                    />
+                    <p className="text-[10px] text-indigo-400 mt-1 uppercase font-black tracking-widest">Harga Konsumen</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -363,7 +380,7 @@ export default function Products() {
                   <div className="flex items-center gap-4">
                     <div className="w-20 h-20 rounded-xl bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
                       {formData.image ? (
-                        <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
+                        <img src={formData.image} alt="Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                       ) : (
                         <ImageIcon className="w-8 h-8 text-slate-300" />
                       )}
