@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   ShoppingCart, 
   ShoppingBag, 
@@ -38,7 +39,7 @@ const MOCK_PRODUCTS: WebstoreProduct[] = [
     name: "ASUS ROG Strix GeForce RTX 4090 OC",
     price: 36500000,
     image: "https://images.unsplash.com/photo-1624705002806-5d72df19c3ad?q=80&w=1000&auto=format&fit=crop",
-    description: "The ultimate GPU with massive cooling and extreme performance for 4K gaming and professional creative work.",
+    description: "GPU terbaik dengan pendinginan masif dan performa ekstrem untuk gaming 4K dan pekerjaan kreatif profesional.",
     category: "GPU"
   },
   {
@@ -46,7 +47,7 @@ const MOCK_PRODUCTS: WebstoreProduct[] = [
     name: "Intel Core i9-14900K Processor",
     price: 9850000,
     image: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?q=80&w=1000&auto=format&fit=crop",
-    description: "24 cores and 32 threads, reaching up to 6.0 GHz. The world's fastest desktop processor for enthusiasts.",
+    description: "24 core dan 32 thread, mencapai hingga 6.0 GHz. Prosesor desktop tercepat di dunia untuk para antusias.",
     category: "CPU"
   },
   {
@@ -54,7 +55,7 @@ const MOCK_PRODUCTS: WebstoreProduct[] = [
     name: "MSI MEG Z790 GODLIKE Motherboard",
     price: 18500000,
     image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000&auto=format&fit=crop",
-    description: "E-ATX flagship motherboard with M-Vision Dashboard and extreme power delivery for record-breaking overclocks.",
+    description: "Motherboard flagship E-ATX dengan M-Vision Dashboard dan pengiriman daya ekstrem untuk overclock pemecah rekor.",
     category: "Motherboard"
   },
   {
@@ -62,7 +63,7 @@ const MOCK_PRODUCTS: WebstoreProduct[] = [
     name: "Corsair Dominator Titanium 64GB DDR5",
     price: 7450000,
     image: "https://images.unsplash.com/photo-1562976540-1502c2145186?q=80&w=1000&auto=format&fit=crop",
-    description: "Premium DDR5 memory with DHX cooling technology and customizable RGB lighting for elite performance.",
+    description: "Memori DDR5 premium dengan teknologi pendinginan DHX dan pencahayaan RGB yang dapat disesuaikan untuk performa elit.",
     category: "RAM"
   },
   {
@@ -70,39 +71,39 @@ const MOCK_PRODUCTS: WebstoreProduct[] = [
     name: "Samsung 990 PRO 4TB NVMe SSD",
     price: 5850000,
     image: "https://images.unsplash.com/photo-1544652478-6653e09f18a2?q=80&w=1000&auto=format&fit=crop",
-    description: "Lightning-fast PCIe 4.0 speeds up to 7,450 MB/s. Perfect for heavy gaming and video editing.",
-    category: "Storage"
+    description: "Kecepatan PCIe 4.0 secepat kilat hingga 7.450 MB/s. Sempurna untuk gaming berat dan pengeditan video.",
+    category: "Penyimpanan"
   },
   {
     id: 6,
     name: "Seasonic PRIME TX-1600 Titanium",
     price: 8250000,
-    image: "https://images.unsplash.com/photo-1591488320449-011701bb6704?q=80&w=1000&auto=format&fit=crop",
-    description: "1600W of 80 PLUS Titanium certified power. The pinnacle of PSU engineering and reliability.",
+    image: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=1000&auto=format&fit=crop",
+    description: "Daya bersertifikat 80 PLUS Titanium 1600W. Puncak teknik dan keandalan PSU.",
     category: "PSU"
   },
   {
     id: 7,
     name: "HYTE Y70 Touch Panoramic Case",
     price: 5450000,
-    image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=1000&auto=format&fit=crop",
-    description: "Modern aesthetic case featuring an integrated 4K multi-touch display and panoramic glass design.",
-    category: "Case"
+    image: "https://images.unsplash.com/photo-1631553127989-53d34086ce13?q=80&w=1000&auto=format&fit=crop",
+    description: "Casing estetika modern yang menampilkan layar multi-sentuh 4K terintegrasi dan desain kaca panoramik.",
+    category: "Casing"
   },
   {
     id: 8,
     name: "Corsair iCUE LINK H150i LCD AIO",
     price: 4950000,
-    image: "https://images.unsplash.com/photo-1555617766-c94804975da3?q=80&w=1000&auto=format&fit=crop",
-    description: "360mm liquid CPU cooler with a vibrant 2.1\" LCD screen and revolutionary iCUE LINK cable system.",
-    category: "Cooling"
+    image: "https://images.unsplash.com/photo-1614932259125-276cb9607f87?q=80&w=1000&auto=format&fit=crop",
+    description: "Pendingin cairan CPU 360mm dengan layar LCD 2,1\" yang cerah dan sistem kabel iCUE LINK yang revolusioner.",
+    category: "Pendingin"
   },
   {
     id: 9,
     name: "ASUS ROG Swift OLED PG42UQ",
     price: 24500000,
     image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?q=80&w=1000&auto=format&fit=crop",
-    description: "41.5-inch 4K OLED gaming monitor with 138Hz overclocked refresh rate and 0.1ms response time.",
+    description: "Monitor gaming OLED 4K 41,5 inci dengan refresh rate 138Hz overclock dan waktu respons 0,1ms.",
     category: "Monitor"
   }
 ];
@@ -213,27 +214,36 @@ export default function Webstore() {
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
               <Cpu className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-black tracking-tight text-slate-900">PC PARTS <span className="text-blue-600">PRO</span></span>
+            <span className="text-xl font-black tracking-tight text-slate-900 uppercase">webstore <span className="text-blue-600">RendyAM</span></span>
           </div>
           
           <div className="hidden md:flex items-center space-x-8 text-sm font-bold text-slate-600">
-            <a href="#" className="hover:text-blue-600 transition-colors">Home</a>
-            <a href="#products" className="hover:text-blue-600 transition-colors">Products</a>
-            <a href="#" className="hover:text-blue-600 transition-colors">Build Guide</a>
-            <a href="#" className="hover:text-blue-600 transition-colors">Support</a>
+            <a href="#" className="hover:text-blue-600 transition-colors">Beranda</a>
+            <a href="#products" className="hover:text-blue-600 transition-colors">Produk</a>
+            <a href="#" className="hover:text-blue-600 transition-colors">Panduan Rakit</a>
+            <a href="#" className="hover:text-blue-600 transition-colors">Dukungan</a>
           </div>
 
-          <button 
-            onClick={() => setIsCartOpen(true)}
-            className="relative p-2 hover:bg-slate-100 rounded-full transition-colors group"
-          >
-            <ShoppingBag className="w-6 h-6 text-slate-700 group-hover:text-blue-600 transition-colors" />
-            {cart.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white">
-                {cart.reduce((a, b) => a + b.quantity, 0)}
-              </span>
-            )}
-          </button>
+          <div className="flex items-center space-x-3">
+            <Link 
+              to="/admin" 
+              className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 flex items-center"
+            >
+              Admin
+            </Link>
+            
+            <button 
+              onClick={() => setIsCartOpen(true)}
+              className="relative p-2 hover:bg-slate-100 rounded-full transition-colors group"
+            >
+              <ShoppingBag className="w-6 h-6 text-slate-700 group-hover:text-blue-600 transition-colors" />
+              {cart.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white">
+                  {cart.reduce((a, b) => a + b.quantity, 0)}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -262,70 +272,70 @@ export default function Webstore() {
                 ))}
               </div>
               <div className="h-4 w-px bg-slate-200" />
-              <span className="text-xs font-bold text-slate-600">Trusted by 10k+ Builders</span>
+              <span className="text-xs font-bold text-slate-600">Dipercaya oleh 10rb+ Perakit</span>
             </motion.div>
-
-            <div className="space-y-6">
-              <motion.h1 
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-                className="text-7xl lg:text-8xl font-black text-slate-900 leading-[0.95] tracking-tight"
-              >
-                Build Your <br />
-                <span className="relative">
-                  <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 bg-[length:200%_auto] animate-gradient">Dream Rig</span>
-                  <svg className="absolute -bottom-2 left-0 w-full h-3 text-blue-100 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
-                    <path d="M0 5 Q 25 0, 50 5 T 100 5" stroke="currentColor" strokeWidth="8" fill="none" strokeLinecap="round" />
-                  </svg>
-                </span>
-              </motion.h1>
-              
-              <motion.p 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.6 }}
-                className="text-xl text-slate-500 max-w-lg leading-relaxed font-medium"
-              >
-                Elevate your computing experience with world-class components. We curate only the most powerful hardware for those who refuse to compromise.
-              </motion.p>
-            </div>
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-              className="flex flex-col sm:flex-row items-start sm:items-center gap-4"
-            >
-              <a href="#products" className="group relative px-8 py-5 bg-slate-900 text-white rounded-[2rem] font-bold overflow-hidden transition-all hover:shadow-2xl hover:shadow-blue-200 active:scale-95">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <span className="relative flex items-center">
-                  Start Building
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </a>
-              <button className="px-8 py-5 bg-white border-2 border-slate-100 text-slate-700 rounded-[2rem] font-bold hover:bg-slate-50 hover:border-blue-100 transition-all flex items-center">
-                <Zap className="w-5 h-5 mr-2 text-blue-600" />
-                Exclusive Deals
-              </button>
-            </motion.div>
-            
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="flex items-center space-x-12 pt-4"
-            >
-              <div className="flex flex-col">
-                <span className="text-3xl font-black text-slate-900 tracking-tighter">99.9%</span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Reliability</span>
-              </div>
-              <div className="w-px h-10 bg-slate-100" />
-              <div className="flex flex-col">
-                <span className="text-3xl font-black text-slate-900 tracking-tighter">24H</span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fast Delivery</span>
-              </div>
-            </motion.div>
+ 
+             <div className="space-y-6">
+               <motion.h1 
+                 initial={{ opacity: 0, y: 30 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 transition={{ duration: 0.6, ease: "easeOut" }}
+                 className="text-7xl lg:text-8xl font-black text-slate-900 leading-[0.95] tracking-tight"
+               >
+                 Bangun <br />
+                 <span className="relative">
+                   <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 bg-[length:200%_auto] animate-gradient">PC Impian</span>
+                   <svg className="absolute -bottom-2 left-0 w-full h-3 text-blue-100 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
+                     <path d="M0 5 Q 25 0, 50 5 T 100 5" stroke="currentColor" strokeWidth="8" fill="none" strokeLinecap="round" />
+                   </svg>
+                 </span>
+               </motion.h1>
+               
+               <motion.p 
+                 initial={{ opacity: 0, y: 20 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 transition={{ delay: 0.2, duration: 0.6 }}
+                 className="text-xl text-slate-500 max-w-lg leading-relaxed font-medium"
+               >
+                 Tingkatkan pengalaman komputasi Anda dengan komponen kelas dunia. Kami mengkurasi hanya hardware paling bertenaga untuk Anda yang menolak berkompromi.
+               </motion.p>
+             </div>
+ 
+             <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ delay: 0.3, duration: 0.6 }}
+               className="flex flex-col sm:flex-row items-start sm:items-center gap-4"
+             >
+               <a href="#products" className="group relative px-8 py-5 bg-slate-900 text-white rounded-[2rem] font-bold overflow-hidden transition-all hover:shadow-2xl hover:shadow-blue-200 active:scale-95">
+                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                 <span className="relative flex items-center">
+                   Mulai Merakit
+                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                 </span>
+               </a>
+               <button className="px-8 py-5 bg-white border-2 border-slate-100 text-slate-700 rounded-[2rem] font-bold hover:bg-slate-50 hover:border-blue-100 transition-all flex items-center">
+                 <Zap className="w-5 h-5 mr-2 text-blue-600" />
+                 Penawaran Eksklusif
+               </button>
+             </motion.div>
+             
+             <motion.div 
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               transition={{ delay: 0.5 }}
+               className="flex items-center space-x-12 pt-4"
+             >
+               <div className="flex flex-col">
+                 <span className="text-3xl font-black text-slate-900 tracking-tighter">99.9%</span>
+                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Keandalan</span>
+               </div>
+               <div className="w-px h-10 bg-slate-100" />
+               <div className="flex flex-col">
+                 <span className="text-3xl font-black text-slate-900 tracking-tighter">24 Jm</span>
+                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pengiriman Cepat</span>
+               </div>
+             </motion.div>
           </div>
           
           <motion.div 
@@ -350,7 +360,7 @@ export default function Webstore() {
             >
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-emerald-500 rounded-full animate-ping" />
-                <span className="text-sm font-bold text-slate-700">In Stock Now</span>
+                <span className="text-sm font-bold text-slate-700">Tersedia Sekarang</span>
               </div>
             </motion.div>
 
@@ -376,7 +386,7 @@ export default function Webstore() {
           transition={{ delay: 0.8 }}
           className="max-w-7xl mx-auto mt-20 pt-10 border-t border-slate-100"
         >
-          <p className="text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-8">Official Hardware Partners</p>
+          <p className="text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-8">Mitra Hardware Resmi</p>
           <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-40 grayscale hover:grayscale-0 transition-all duration-500">
             {['NVIDIA', 'INTEL', 'ASUS', 'MSI', 'CORSAIR', 'SAMSUNG'].map(brand => (
               <span key={brand} className="text-xl md:text-2xl font-black text-slate-400 hover:text-blue-600 cursor-default transition-colors">{brand}</span>
@@ -393,8 +403,8 @@ export default function Webstore() {
               <ShieldCheck className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 mb-1">Official Warranty</h3>
-              <p className="text-sm text-slate-500">All products come with genuine manufacturer warranty.</p>
+              <h3 className="font-bold text-slate-900 mb-1">Garansi Resmi</h3>
+              <p className="text-sm text-slate-500">Semua produk disertai garansi asli dari produsen.</p>
             </div>
           </div>
           <div className="flex items-start space-x-4">
@@ -402,8 +412,8 @@ export default function Webstore() {
               <Truck className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 mb-1">Fast Shipping</h3>
-              <p className="text-sm text-slate-500">Safe and insured delivery across the country.</p>
+              <h3 className="font-bold text-slate-900 mb-1">Pengiriman Cepat</h3>
+              <p className="text-sm text-slate-500">Pengiriman aman dan asuransi ke seluruh pelosok negeri.</p>
             </div>
           </div>
           <div className="flex items-start space-x-4">
@@ -411,8 +421,8 @@ export default function Webstore() {
               <MessageCircle className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 mb-1">Expert Advice</h3>
-              <p className="text-sm text-slate-500">Consult with our experts for your perfect build.</p>
+              <h3 className="font-bold text-slate-900 mb-1">Saran Ahli</h3>
+              <p className="text-sm text-slate-500">Konsultasikan dengan ahli kami untuk PC impian Anda.</p>
             </div>
           </div>
         </div>
@@ -423,14 +433,14 @@ export default function Webstore() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-end justify-between mb-12">
             <div className="space-y-2">
-              <h2 className="text-4xl font-black text-slate-900">Featured Components</h2>
-              <p className="text-slate-500">Top-tier hardware for your next masterpiece.</p>
+              <h2 className="text-4xl font-black text-slate-900">Komponen Unggulan</h2>
+              <p className="text-slate-500">Hardware kelas atas untuk mahakarya Anda berikutnya.</p>
             </div>
             <div className="flex space-x-2">
-              {['All', 'GPU', 'CPU', 'RAM'].map(cat => (
+              {['Semua', 'GPU', 'CPU', 'RAM'].map(cat => (
                 <button key={cat} className={cn(
                   "px-4 py-2 rounded-xl text-sm font-bold transition-all",
-                  cat === 'All' ? "bg-blue-600 text-white shadow-lg shadow-blue-200" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  cat === 'Semua' ? "bg-blue-600 text-white shadow-lg shadow-blue-200" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 )}>
                   {cat}
                 </button>
@@ -489,24 +499,24 @@ export default function Webstore() {
               <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
                 <Cpu className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-black tracking-tight">PC PARTS PRO</span>
+              <span className="text-xl font-black tracking-tight uppercase">webstore RendyAM</span>
             </div>
             <p className="text-slate-400 max-w-sm leading-relaxed">
-              Your ultimate destination for premium PC hardware. We provide the best components with official warranty and expert support.
+              Tujuan utama Anda untuk hardware PC premium. Kami menyediakan komponen terbaik dengan garansi resmi dan dukungan ahli.
             </p>
           </div>
           <div className="space-y-6">
-            <h4 className="font-bold text-lg">Quick Links</h4>
+            <h4 className="font-bold text-lg">Tautan Cepat</h4>
             <ul className="space-y-4 text-slate-400 text-sm">
-              <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Tentang Kami</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Kebijakan Privasi</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Syarat & Ketentuan</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Kontak</a></li>
             </ul>
           </div>
           <div className="space-y-6">
-            <h4 className="font-bold text-lg">Newsletter</h4>
-            <p className="text-sm text-slate-400">Subscribe to get the latest deals and hardware news.</p>
+            <h4 className="font-bold text-lg">Buletin</h4>
+            <p className="text-sm text-slate-400">Berlangganan untuk mendapatkan penawaran terbaru dan berita hardware.</p>
             <div className="flex space-x-2">
               <input type="email" placeholder="Email" className="bg-slate-800 border-none rounded-xl px-4 py-2 text-sm w-full focus:ring-2 focus:ring-blue-500 outline-none" />
               <button className="p-2 bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors">
@@ -516,7 +526,7 @@ export default function Webstore() {
           </div>
         </div>
         <div className="max-w-7xl mx-auto pt-12 mt-12 border-t border-slate-800 text-center text-sm text-slate-500">
-          © 2026 PC Parts Pro. All rights reserved.
+          © 2026 webstore RendyAM. Seluruh hak cipta dilindungi.
         </div>
       </footer>
 
@@ -543,27 +553,27 @@ export default function Webstore() {
                   <div className="p-2 bg-blue-50 rounded-xl">
                     <ShoppingCart className="w-6 h-6 text-blue-600" />
                   </div>
-                  <h2 className="text-xl font-black text-slate-900">Your Cart</h2>
+                  <h2 className="text-xl font-black text-slate-900">Keranjang Anda</h2>
                 </div>
                 <button onClick={() => setIsCartOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
                   <X className="w-6 h-6 text-slate-400" />
                 </button>
               </div>
-
-              <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                {cart.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-4">
-                    <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center">
-                      <ShoppingBag className="w-10 h-10 opacity-20" />
-                    </div>
-                    <p className="font-medium italic">Your cart is empty</p>
-                    <button 
-                      onClick={() => setIsCartOpen(false)}
-                      className="text-blue-600 font-bold hover:underline"
-                    >
-                      Start Shopping
-                    </button>
-                  </div>
+ 
+               <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                 {cart.length === 0 ? (
+                   <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-4">
+                     <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center">
+                       <ShoppingBag className="w-10 h-10 opacity-20" />
+                     </div>
+                     <p className="font-medium italic">Keranjang Anda kosong</p>
+                     <button 
+                       onClick={() => setIsCartOpen(false)}
+                       className="text-blue-600 font-bold hover:underline"
+                     >
+                       Mulai Belanja
+                     </button>
+                   </div>
                 ) : (
                   cart.map((item) => (
                     <div key={item.id} className="flex space-x-4 group">
@@ -610,25 +620,25 @@ export default function Webstore() {
                       <span className="font-bold text-slate-900">{formatCurrency(total)}</span>
                     </div>
                     <div className="flex justify-between text-slate-500">
-                      <span>Shipping</span>
-                      <span className="text-emerald-600 font-bold">Free</span>
+                      <span>Pengiriman</span>
+                      <span className="text-emerald-600 font-bold">Gratis</span>
                     </div>
                     <div className="pt-4 border-t border-slate-200 flex justify-between items-center">
                       <span className="text-lg font-bold text-slate-900">Total</span>
                       <span className="text-2xl font-black text-blue-600">{formatCurrency(total)}</span>
                     </div>
                   </div>
-
-                  <button 
-                    onClick={handleCheckoutInitiate}
-                    className="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-lg hover:bg-blue-700 transition-all shadow-xl shadow-blue-200 flex items-center justify-center space-x-3"
-                  >
-                    <ShoppingBag className="w-6 h-6" />
-                    <span>Selesaikan Pesanan</span>
-                  </button>
-                  <p className="text-[10px] text-center text-slate-400 uppercase tracking-widest font-bold">
-                    Secure Checkout Guaranteed
-                  </p>
+ 
+                   <button 
+                     onClick={handleCheckoutInitiate}
+                     className="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-lg hover:bg-blue-700 transition-all shadow-xl shadow-blue-200 flex items-center justify-center space-x-3"
+                   >
+                     <ShoppingBag className="w-6 h-6" />
+                     <span>Selesaikan Pesanan</span>
+                   </button>
+                   <p className="text-[10px] text-center text-slate-400 uppercase tracking-widest font-bold">
+                     Checkout Aman & Terjamin
+                   </p>
                 </div>
               )}
             </motion.div>

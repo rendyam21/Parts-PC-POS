@@ -1,5 +1,5 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
-import { Product, Transaction } from '../types';
+import { Product, Transaction, Supplier } from '../types';
 
 interface PCPartsDB extends DBSchema {
   products: {
@@ -12,14 +12,19 @@ interface PCPartsDB extends DBSchema {
     value: Transaction;
     indexes: { 'by-date': number };
   };
+  suppliers: {
+    key: number;
+    value: Supplier;
+    indexes: { 'by-name': string };
+  };
 }
 
 const DATABASE_NAME = 'pc-parts-pos-db';
-const DATABASE_VERSION = 1;
+const DATABASE_VERSION = 2;
 
 export async function initDB(): Promise<IDBPDatabase<PCPartsDB>> {
   return openDB<PCPartsDB>(DATABASE_NAME, DATABASE_VERSION, {
-    upgrade(db) {
+    upgrade(db, oldVersion) {
       if (!db.objectStoreNames.contains('products')) {
         const productStore = db.createObjectStore('products', {
           keyPath: 'id',
@@ -33,6 +38,13 @@ export async function initDB(): Promise<IDBPDatabase<PCPartsDB>> {
           autoIncrement: true,
         });
         transactionStore.createIndex('by-date', 'timestamp');
+      }
+      if (!db.objectStoreNames.contains('suppliers')) {
+        const supplierStore = db.createObjectStore('suppliers', {
+          keyPath: 'id',
+          autoIncrement: true,
+        });
+        supplierStore.createIndex('by-name', 'name');
       }
     },
   });
@@ -81,4 +93,25 @@ export async function addTransaction(transaction: Omit<Transaction, 'id' | 'time
 export async function getAllTransactions() {
   const db = await dbPromise;
   return db.getAll('transactions');
+}
+
+// Supplier operations
+export async function getAllSuppliers() {
+  const db = await dbPromise;
+  return db.getAll('suppliers');
+}
+
+export async function addSupplier(supplier: Omit<Supplier, 'id' | 'createdAt'>) {
+  const db = await dbPromise;
+  return db.add('suppliers', { ...supplier, createdAt: Date.now() } as Supplier);
+}
+
+export async function updateSupplier(supplier: Supplier) {
+  const db = await dbPromise;
+  return db.put('suppliers', supplier);
+}
+
+export async function deleteSupplier(id: number) {
+  const db = await dbPromise;
+  return db.delete('suppliers', id);
 }

@@ -9,15 +9,17 @@ import {
   Package,
   X,
   Upload,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Truck
 } from 'lucide-react';
-import { getAllProducts, addProduct, updateProduct, deleteProduct } from '../lib/db';
-import { Product } from '../types';
+import { getAllProducts, addProduct, updateProduct, deleteProduct, getAllSuppliers } from '../lib/db';
+import { Product, Supplier } from '../types';
 import { formatCurrency, cn, formatNumber, parseNumber } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,7 +32,8 @@ export default function Products() {
     costPrice: 0,
     stock: 0,
     category: 'Umum',
-    image: ''
+    image: '',
+    supplierId: undefined as number | undefined
   });
 
   const seedData = async () => {
@@ -40,27 +43,31 @@ export default function Products() {
       { name: "MSI MEG Z790 GODLIKE Motherboard", price: 18500000, costPrice: 16000000, stock: 3, category: "Motherboard", image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000&auto=format&fit=crop" },
       { name: "Corsair Dominator Titanium 64GB DDR5", price: 7450000, costPrice: 6500000, stock: 8, category: "RAM", image: "https://images.unsplash.com/photo-1562976540-1502c2145186?q=80&w=1000&auto=format&fit=crop" },
       { name: "Samsung 990 PRO 4TB NVMe SSD", price: 5850000, costPrice: 5000000, stock: 15, category: "Storage", image: "https://images.unsplash.com/photo-1544652478-6653e09f18a2?q=80&w=1000&auto=format&fit=crop" },
-      { name: "Seasonic PRIME TX-1600 Titanium", price: 8250000, costPrice: 7200000, stock: 6, category: "PSU", image: "https://images.unsplash.com/photo-1591488320449-011701bb6704?q=80&w=1000&auto=format&fit=crop" },
-      { name: "HYTE Y70 Touch Panoramic Case", price: 5450000, costPrice: 4800000, stock: 4, category: "Case", image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=1000&auto=format&fit=crop" },
-      { name: "Corsair iCUE LINK H150i LCD AIO", price: 4950000, costPrice: 4200000, stock: 10, category: "Cooling", image: "https://images.unsplash.com/photo-1555617766-c94804975da3?q=80&w=1000&auto=format&fit=crop" },
+      { name: "Seasonic PRIME TX-1600 Titanium", price: 8250000, costPrice: 7200000, stock: 6, category: "PSU", image: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=1000&auto=format&fit=crop" },
+      { name: "HYTE Y70 Touch Panoramic Case", price: 5450000, costPrice: 4800000, stock: 4, category: "Case", image: "https://images.unsplash.com/photo-1631553127989-53d34086ce13?q=80&w=1000&auto=format&fit=crop" },
+      { name: "Corsair iCUE LINK H150i LCD AIO", price: 4950000, costPrice: 4200000, stock: 10, category: "Cooling", image: "https://images.unsplash.com/photo-1614932259125-276cb9607f87?q=80&w=1000&auto=format&fit=crop" },
       { name: "ASUS ROG Swift OLED PG42UQ", price: 24500000, costPrice: 21000000, stock: 2, category: "Monitor", image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?q=80&w=1000&auto=format&fit=crop" }
     ];
 
     if (confirm('Ini akan menambahkan 9 produk sampel ke inventaris. Lanjutkan?')) {
       for (const sample of samples) {
-        await addProduct(sample);
+        await addProduct(sample as any);
       }
-      fetchProducts();
+      fetchData();
     }
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchData();
   }, []);
 
-  async function fetchProducts() {
-    const data = await getAllProducts();
-    setProducts(data);
+  async function fetchData() {
+    const [pData, sData] = await Promise.all([
+      getAllProducts(),
+      getAllSuppliers()
+    ]);
+    setProducts(pData);
+    setSuppliers(sData);
     setLoading(false);
   }
 
@@ -78,8 +85,8 @@ export default function Products() {
     }
     setIsModalOpen(false);
     setEditingProduct(null);
-    setFormData({ name: '', price: 0, costPrice: 0, stock: 0, category: 'Umum', image: '' });
-    fetchProducts();
+    setFormData({ name: '', price: 0, costPrice: 0, stock: 0, category: 'Umum', image: '', supplierId: undefined });
+    fetchData();
   };
 
   const handleEdit = (product: Product) => {
@@ -90,7 +97,8 @@ export default function Products() {
       costPrice: product.costPrice || 0,
       stock: product.stock,
       category: product.category,
-      image: product.image || ''
+      image: product.image || '',
+      supplierId: product.supplierId
     });
     setIsModalOpen(true);
   };
@@ -98,7 +106,7 @@ export default function Products() {
   const handleDelete = async (id: number) => {
     if (confirm('Apakah Anda yakin ingin menghapus produk ini?')) {
       await deleteProduct(id);
-      fetchProducts();
+      fetchData();
     }
   };
 
@@ -125,7 +133,7 @@ export default function Products() {
             onClick={seedData}
             className="flex items-center justify-center px-4 py-2.5 bg-slate-100 text-slate-600 rounded-xl font-semibold hover:bg-slate-200 transition-colors shadow-sm"
           >
-            Seed Sample
+            Sampel Data
           </button>
           <button 
             onClick={() => {
@@ -141,7 +149,6 @@ export default function Products() {
         </div>
       </div>
 
-      {/* Filters & Search */}
       <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -167,6 +174,7 @@ export default function Products() {
               <tr className="bg-slate-50 border-b border-slate-200">
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Produk</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Kategori</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Supplier</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">H. Jual</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">H. Modal</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Stok</th>
@@ -192,6 +200,12 @@ export default function Products() {
                     <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">
                       {product.category}
                     </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center space-x-1 text-xs text-slate-500">
+                      <Truck className="w-3 h-3" />
+                      <span>{suppliers.find(s => s.id === product.supplierId)?.name || '-'}</span>
+                    </div>
                   </td>
                   <td className="px-6 py-4 font-medium text-slate-900 text-sm">
                     {formatCurrency(product.price)}
@@ -320,16 +334,29 @@ export default function Products() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">Stok</label>
-                    <input 
-                      required
-                      type="number"
-                      value={formData.stock}
-                      onChange={(e) => setFormData({...formData, stock: Number(e.target.value)})}
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Supplier</label>
+                    <select 
+                      value={formData.supplierId || ''}
+                      onChange={(e) => setFormData({...formData, supplierId: e.target.value ? Number(e.target.value) : undefined})}
                       className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
-                      placeholder="0"
-                    />
+                    >
+                      <option value="">Pilih Supplier</option>
+                      {suppliers.map(s => (
+                        <option key={s.id} value={s.id}>{s.name}</option>
+                      ))}
+                    </select>
                   </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Stok</label>
+                  <input 
+                    required
+                    type="number"
+                    value={formData.stock}
+                    onChange={(e) => setFormData({...formData, stock: Number(e.target.value)})}
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                    placeholder="0"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-1">Gambar Produk</label>

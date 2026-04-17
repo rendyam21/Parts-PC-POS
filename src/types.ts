@@ -6,6 +6,17 @@ export interface Product {
   stock: number;
   category: string;
   image?: string;
+  supplierId?: number; // Added: ID Supplier
+  createdAt: number;
+}
+
+export interface Supplier {
+  id?: number;
+  name: string;
+  contact: string;
+  address: string;
+  email?: string;
+  category?: string;
   createdAt: number;
 }
 

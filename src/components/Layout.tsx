@@ -11,7 +11,9 @@ import {
   Bell,
   UserCircle,
   Globe,
-  BarChart3
+  BarChart3,
+  Truck,
+  ArrowLeft
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
@@ -19,6 +21,7 @@ import { motion, AnimatePresence } from 'motion/react';
 const navItems = [
   { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
   { name: 'Kelola Produk', path: '/admin/products', icon: Package },
+  { name: 'Kelola Supplier', path: '/admin/suppliers', icon: Truck },
   { name: 'Kasir / PoS', path: '/admin/pos', icon: ShoppingCart },
   { name: 'Riwayat Transaksi', path: '/admin/transactions', icon: History },
   { name: 'Laporan', path: '/admin/reports', icon: BarChart3 },
@@ -61,8 +64,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               "ml-3 flex flex-col transition-all duration-300 origin-left truncate",
               !isSidebarOpen && "lg:scale-0 lg:opacity-0 lg:w-0"
             )}>
-              <span className="font-black text-sm uppercase tracking-tighter leading-tight">PC PARTS PRO</span>
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">Admin Panel</span>
+              <span className="font-black text-xs uppercase tracking-tighter leading-tight">webstore RendyAM</span>
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">Panel Admin</span>
             </div>
           </div>
 
@@ -116,8 +119,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 "ml-3 transition-all duration-300 origin-left truncate",
                 !isSidebarOpen && "lg:scale-0 lg:opacity-0 lg:w-0"
               )}>
-                <p className="text-[10px] font-black uppercase text-slate-900 leading-tight">Tech Store</p>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Admin</p>
+                <p className="text-[10px] font-black uppercase text-slate-900 leading-tight">webstore RendyAM</p>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Administrator</p>
               </div>
             </div>
           </div>
@@ -136,13 +139,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <Menu className="w-5 h-5" />
             </button>
             <div className="h-4 w-px bg-slate-200 hidden sm:block"></div>
-            <div className="hidden sm:flex items-center space-x-1">
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Admin</span>
-              <span className="text-[10px] font-black text-slate-200">/</span>
-              <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
-                {location.pathname.split('/').pop() === 'reports' ? 'Laporan' : (location.pathname.split('/').pop() || 'Dashboard')}
-              </span>
-            </div>
+            <Link 
+              to="/" 
+              className="flex items-center px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-blue-600 bg-slate-50 hover:bg-blue-50 rounded-lg transition-all border border-slate-100 group"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 mr-1.5 group-hover:-translate-x-0.5 transition-transform" />
+              Ke Toko
+            </Link>
           </div>
 
           <div className="flex items-center space-x-4">

@@ -475,7 +475,7 @@ export default function POS() {
               {/* Printable Receipt Preview */}
               <div className="bg-slate-50 rounded-3xl p-6 space-y-4 text-left printable">
                 <div className="text-center border-b border-dashed border-slate-200 pb-3 mb-2">
-                  <p className="font-black text-xs uppercase tracking-widest">PC PARTS PRO - POS</p>
+                  <p className="font-black text-xs uppercase tracking-widest">webstore RendyAM</p>
                   <p className="text-[10px] text-slate-400">Bukti Transaksi Toko</p>
                 </div>
 

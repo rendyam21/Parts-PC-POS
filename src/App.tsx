@@ -11,6 +11,7 @@ import Products from './pages/Products';
 import POS from './pages/POS';
 import Transactions from './pages/Transactions';
 import Reports from './pages/Reports';
+import Suppliers from './pages/Suppliers';
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
               <Route path="pos" element={<POS />} />
               <Route path="transactions" element={<Transactions />} />
               <Route path="reports" element={<Reports />} />
+              <Route path="suppliers" element={<Suppliers />} />
             </Routes>
           </Layout>
         } />

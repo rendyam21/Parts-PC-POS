@@ -2,10 +2,24 @@ import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
-import { getAllProducts, addProduct } from './lib/db';
+import { getAllProducts, addProduct, getAllSuppliers, addSupplier } from './lib/db';
 
 async function seedData() {
-  const products = await getAllProducts();
+  const [products, suppliers] = await Promise.all([
+    getAllProducts(),
+    getAllSuppliers()
+  ]);
+
+  if (suppliers.length === 0) {
+    const initialSuppliers = [
+      { name: 'Global Tech Distribution', contact: '0812-3444-5555', address: 'Glodok Jaya Lt. 4, Jakarta', email: 'sales@globaltech.com', category: 'Umum' },
+      { name: 'Micro Star Asia', contact: '0811-9988-7766', address: 'Mangga Dua Mall Lt. 5, Jakarta', email: 'support@ms-asia.com', category: 'Motherboard' },
+    ];
+    for (const s of initialSuppliers) {
+      await addSupplier(s);
+    }
+  }
+
   if (products.length === 0) {
     const initialProducts = [
       { name: 'Intel Core i9-14900K', price: 9500000, costPrice: 8500000, stock: 15, category: 'Processor', image: 'https://picsum.photos/seed/cpu/200' },
@@ -16,7 +30,7 @@ async function seedData() {
       { name: 'Corsair RM1000x 1000W', price: 3200000, costPrice: 2600000, stock: 12, category: 'PSU', image: 'https://picsum.photos/seed/psu/200' },
     ];
     for (const p of initialProducts) {
-      await addProduct(p);
+      await addProduct(p as any);
     }
   }
 }

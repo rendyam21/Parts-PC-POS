@@ -140,7 +140,7 @@ export default function Reports() {
       {/* KPI Section */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Income', value: formatCurrency(totalRevenue), icon: TrendingUp, color: 'text-blue-600', bg: 'bg-blue-50' },
+          { label: 'Total Pemasukan', value: formatCurrency(totalRevenue), icon: TrendingUp, color: 'text-blue-600', bg: 'bg-blue-50' },
           { label: 'Total Modal', value: formatCurrency(totalCost), icon: ArrowDownRight, color: 'text-rose-600', bg: 'bg-rose-50' },
           { label: 'Total Laba (Profit)', value: formatCurrency(totalProfit), icon: ArrowUpRight, color: 'text-emerald-600', bg: 'bg-emerald-50' },
           { label: 'Item Terjual', value: totalItemsSold, icon: PieChartIcon, color: 'text-amber-600', bg: 'bg-amber-50' },

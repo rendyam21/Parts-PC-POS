@@ -93,9 +93,9 @@ export default function Transactions() {
       {/* Financial Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: 'Total Income (Penjualan)', value: summary.income, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { label: 'Total Outcome (Modal)', value: summary.outcome, icon: TrendingDown, color: 'text-rose-600', bg: 'bg-rose-50' },
-          { label: 'Total Profit (Laba)', value: summary.profit, icon: DollarSign, color: 'text-blue-600', bg: 'bg-blue-50' },
+          { label: 'Total Pemasukan (Penjualan)', value: summary.income, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: 'Total Pengeluaran (Modal)', value: summary.outcome, icon: TrendingDown, color: 'text-rose-600', bg: 'bg-rose-50' },
+          { label: 'Total Keuntungan (Laba)', value: summary.profit, icon: DollarSign, color: 'text-blue-600', bg: 'bg-blue-50' },
         ].map((item, idx) => (
           <motion.div
             key={item.label}
@@ -157,16 +157,16 @@ export default function Transactions() {
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden no-print">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-100">
-                <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">ID</th>
-                <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Waktu</th>
-                <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Metode</th>
-                <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Income</th>
-                <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Profit</th>
-                <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Aksi</th>
-              </tr>
-            </thead>
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-100">
+                    <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">ID</th>
+                    <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Waktu</th>
+                    <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Metode</th>
+                    <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Pemasukan</th>
+                    <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Keuntungan</th>
+                    <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Aksi</th>
+                  </tr>
+                </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredTransactions.map((tx) => {
                 const Icon = getPaymentIcon(tx.paymentMethod);
@@ -278,17 +278,17 @@ export default function Transactions() {
                 {/* Summary Table */}
                 <div className="bg-slate-50 rounded-2xl p-4 space-y-3">
                   <div className="flex justify-between text-xs font-bold">
-                    <span className="text-slate-500">Total Income (Penjualan)</span>
+                    <span className="text-slate-500">Total Pemasukan (Penjualan)</span>
                     <span className="text-slate-900">{formatCurrency(selectedTransaction.total)}</span>
                   </div>
                   <div className="flex justify-between text-xs font-bold">
-                    <span className="text-slate-500">Total Outcome (Modal)</span>
+                    <span className="text-slate-500">Total Pengeluaran (Modal)</span>
                     <span className="text-rose-600">
                       -{formatCurrency(selectedTransaction.items.reduce((acc, i) => acc + (i.costPrice * i.quantity), 0))}
                     </span>
                   </div>
                   <div className="pt-2 border-t border-slate-200 flex justify-between items-center">
-                    <span className="text-sm font-black text-slate-900 uppercase">Gross Profit</span>
+                    <span className="text-sm font-black text-slate-900 uppercase">Laba Kotor</span>
                     <span className="text-lg font-black text-emerald-600">
                       {formatCurrency(selectedTransaction.total - selectedTransaction.items.reduce((acc, i) => acc + (i.costPrice * i.quantity), 0))}
                     </span>
